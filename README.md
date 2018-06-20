@@ -1,4 +1,5 @@
-# 作业说明
+# 作业：通过神经网络预测房价
+by Grant, 2018/6/15
 
 ## 文件说明
 predict-house-prices.ipynb: 完成的Jupyter notebook文件
