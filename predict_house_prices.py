@@ -34,21 +34,31 @@ from torch import nn
 def get_model():
     # todo: 使用 nn.Sequential 来构造多层神经网络，注意第一层的输入
     model = nn.Sequential(
-        nn.Linear(331, 100), 
-        nn.Tanh(),
-        nn.Linear(100, 30), 
-        nn.Tanh(),
-        nn.Linear(30, 10), 
-        nn.Tanh(),
+        nn.Linear(331, 200), 
+        nn.ReLU(),
+        nn.Linear(200, 150), 
+        nn.ReLU(),
+        nn.Linear(150, 100), 
+        nn.ReLU(),
+        nn.Linear(100, 50), 
+        nn.ReLU(),
+        nn.Linear(50, 20), 
+        nn.ReLU(),
+        nn.Linear(20, 10), 
+        nn.ReLU(),
         nn.Linear(10, 1)
     )
     return model
 
+def set_learning_rate(optimizer, lr):
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
+
 # 可以调整的超参
 batch_size = 32
-epochs = 400
+epochs = 5000
 use_gpu = True
-lr = 1
+lr = 0.0001
 weight_decay = 10
 
 if use_gpu:
@@ -91,7 +101,7 @@ def train_model(model, x_train, y_train, x_valid, y_valid, epochs, lr, weight_de
     # optimizer = torch.optim.Adagrad(model.parameters(), lr=0.1)
     # optimizer = torch.optim.RMSprop(model.parameters(), lr=1, alpha=0.9)
     # optimizer = torch.optim.Adadelta(model.parameters(), rho=0.99)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1)
+    optimizer = torch.optim.Adam(model.parameters(), lr)
 
     if use_gpu:
         model = model.cuda()
@@ -126,10 +136,10 @@ def train_model(model, x_train, y_train, x_valid, y_valid, epochs, lr, weight_de
         # 测试模型
         if x_valid is not None:
             metric_log['valid_loss'].append(get_rmse_log(model, x_valid, y_valid, use_gpu))
-            print_str = 'epoch: {}, train loss: {:.3f}, valid loss: {:.3f}'\
-            .format(e+1, metric_log['train_loss'][-1], metric_log['valid_loss'][-1])
+            print_str = 'epoch: {}, train loss: {:.3f}, valid loss: {:.3f}, lr:{:.4f}'\
+            .format(e+1, metric_log['train_loss'][-1], metric_log['valid_loss'][-1], lr)
         else:
-            print_str = 'epoch: {}, train loss: {:.3f}'.format(e+1, metric_log['train_loss'][-1])
+            print_str = 'epoch: {}, train loss: {:.3f}, lr: {:.4f}'.format(e+1, metric_log['train_loss'][-1], lr)
         if (e + 1) % 10 == 0:
             print(print_str)
             # print()
